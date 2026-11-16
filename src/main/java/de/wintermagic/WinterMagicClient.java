@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,13 +33,13 @@ public final class WinterMagicClient implements ClientModInitializer {
 
     private void updateModel(ItemStack stack) {
         if (stack.isEmpty()) return;
-        ResourceLocation vanillaId = BuiltInRegistries.ITEM.getKey(stack.getItem());
-        ResourceLocation current = stack.get(DataComponents.ITEM_MODEL);
+        Identifier vanillaId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        Identifier current = stack.get(DataComponents.ITEM_MODEL);
         String name = stack.getHoverName().getString();
         String expectedBase = DESIGNS.get(name);
-        ResourceLocation desired = null;
+        Identifier desired = null;
         if (expectedBase != null && expectedBase.equals(vanillaId.toString())) {
-            desired = ResourceLocation.fromNamespaceAndPath("wintermagic", modelId(name));
+            desired = Identifier.fromNamespaceAndPath("wintermagic", modelId(name));
         }
         if (desired != null) {
             if (!desired.equals(current)) stack.set(DataComponents.ITEM_MODEL, desired);

@@ -39,6 +39,7 @@ public final class WinterMagicNames {
         result.put("Snowman Head", "minecraft:netherite_helmet");
         result.put("Aurora Crown", "minecraft:netherite_helmet");
         result.put("Santa Beard", "minecraft:netherite_helmet");
+        result.put("Christmas Tree Hat", "minecraft:netherite_helmet");
         result.put("Winter Scarf", "minecraft:netherite_chestplate");
         result.put("Santa's Bag", "minecraft:netherite_chestplate");
         result.put("Gingerbread", "minecraft:netherite_chestplate");

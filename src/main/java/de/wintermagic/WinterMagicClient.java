@@ -1,113 +1,100 @@
-
 package de.wintermagic;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+/** Client-side item-model selection for the 43 existing Winter Magic models. */
 public final class WinterMagicClient implements ClientModInitializer {
-    private static final Logger LOG =
-            LoggerFactory.getLogger("wintermagic");
-
-    private static final Map<String, String> DESIGNS =
-            WinterMagicNames.all();
-
-    private String lastHandName = "";
-    private String lastArmorName = "";
+    private static final Logger LOG = LoggerFactory.getLogger("wintermagic");
+    private static final Map<String, String> DESIGNS = WinterMagicNames.all();
 
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
-        LOG.info("Winter Magic loaded with {} designs",
-                DESIGNS.size());
+        LOG.info("Winter Magic: {} name-to-model mappings loaded", DESIGNS.size());
     }
 
     private void onTick(Minecraft client) {
-        if (client.player == null || client.level == null) {
-            lastHandName = "";
-            lastArmorName = "";
-            return;
-        }
-
-        ItemStack hand = client.player.getMainHandItem();
-        if (hand.isEmpty()) {
-            hand = client.player.getOffhandItem();
-        }
-
-        String handName = recognizedName(hand);
-
-        if (!handName.equals(lastHandName)) {
-            lastHandName = handName;
-
-            if (!handName.isEmpty()) {
-                show(client, handName + " erkannt");
-            }
-        }
-
-        ItemStack helmet = client.player.getItemBySlot(
-                EquipmentSlot.HEAD);
-
-        ItemStack chestplate = client.player.getItemBySlot(
-                EquipmentSlot.CHEST);
-
-        ItemStack leggings = client.player.getItemBySlot(
-                EquipmentSlot.LEGS);
-
-        ItemStack boots = client.player.getItemBySlot(
-                EquipmentSlot.FEET);
-
-        String armorName = "";
-
-        if (helmet.is(Items.NETHERITE_HELMET)) {
-            armorName = recognizedName(helmet);
-        }
-
-        if (armorName.isEmpty()
-                && chestplate.is(Items.NETHERITE_CHESTPLATE)) {
-            armorName = recognizedName(chestplate);
-        }
-
-        if (armorName.isEmpty()
-                && leggings.is(Items.NETHERITE_LEGGINGS)) {
-            armorName = recognizedName(leggings);
-        }
-
-        if (armorName.isEmpty()
-                && boots.is(Items.NETHERITE_BOOTS)) {
-            armorName = recognizedName(boots);
-        }
-
-        if (!armorName.equals(lastArmorName)) {
-            lastArmorName = armorName;
-
-            if (!armorName.isEmpty()) {
-                show(client, armorName + " ausgerüstet");
-            }
+        if (client.player == null || client.level == null) return;
+        // All player inventory slots, including equipped armor and offhand.
+        for (int slot = 0; slot < client.player.getInventory().getContainerSize(); slot++) {
+            updateModel(client.player.getInventory().getItem(slot));
         }
     }
 
-    private String recognizedName(ItemStack stack) {
-        if (stack.isEmpty()) {
-            return "";
-        }
-
+    private void updateModel(ItemStack stack) {
+        if (stack.isEmpty()) return;
+        ResourceLocation vanillaId = BuiltInRegistries.ITEM.getKey(stack.getItem());
+        ResourceLocation current = stack.get(DataComponents.ITEM_MODEL);
         String name = stack.getHoverName().getString();
-
-        return DESIGNS.containsKey(name) ? name : "";
+        String expectedBase = DESIGNS.get(name);
+        ResourceLocation desired = null;
+        if (expectedBase != null && expectedBase.equals(vanillaId.toString())) {
+            desired = ResourceLocation.fromNamespaceAndPath("wintermagic", modelId(name));
+        }
+        if (desired != null) {
+            if (!desired.equals(current)) stack.set(DataComponents.ITEM_MODEL, desired);
+        } else if (current != null && "wintermagic".equals(current.getNamespace())) {
+            // A previously named item was renamed back: restore its vanilla model.
+            stack.set(DataComponents.ITEM_MODEL, vanillaId);
+        }
     }
 
-    private void show(Minecraft client, String message) {
-        client.player.displayClientMessage(
-                Component.literal("Winter Magic: " + message),
-                true
-        );
+    private static String modelId(String name) {
+        return switch (name) {
+            case "Christmas Tree" -> "christmas_tree";
+            case "Christmas Tree Hat" -> "christmas_tree_hat";
+            case "Mini Christmas Tree" -> "mini_christmas_tree";
+            case "Christmas Present" -> "christmas_present";
+            case "Red Present" -> "red_present";
+            case "Blue Present" -> "blue_present";
+            case "Green Present" -> "green_present";
+            case "Snow Globe" -> "snow_globe";
+            case "Christmas Wreath" -> "christmas_wreath";
+            case "Gingerbread House" -> "gingerbread_house";
+            case "Nutcracker" -> "nutcracker";
+            case "Snowflake" -> "snowflake";
+            case "Hot Chocolate" -> "hot_chocolate";
+            case "Candy Cane" -> "candy_cane";
+            case "Christmas Bauble" -> "christmas_bauble";
+            case "Christmas Candle" -> "christmas_candle";
+            case "Christmas Star" -> "christmas_star";
+            case "Fireplace" -> "fireplace";
+            case "Santa Stocking" -> "santa_stocking";
+            case "Snowman" -> "snowman";
+            case "North Pole Compass" -> "north_pole_compass";
+            case "Christmas Clock" -> "christmas_clock";
+            case "Letter to Santa" -> "letter_to_santa";
+            case "Christmas Lantern" -> "christmas_lantern";
+            case "Penguin" -> "penguin";
+            case "Santa's Hat" -> "santa_hat";
+            case "Reindeer Antlers" -> "reindeer_antlers";
+            case "Ice Crown" -> "ice_crown";
+            case "Snowman Head" -> "snowman_head";
+            case "Aurora Crown" -> "aurora_crown";
+            case "Santa Beard" -> "santa_beard";
+            case "Winter Scarf" -> "winter_scarf";
+            case "Santa's Bag" -> "santas_bag";
+            case "Gingerbread" -> "gingerbread";
+            case "Present" -> "present_armor";
+            case "Frost Wings" -> "frost_wings";
+            case "Elf Pants" -> "elf_pants";
+            case "Candy Cane Pants" -> "candy_cane_pants";
+            case "Santa Pants" -> "santa_pants";
+            case "Elf Boots" -> "elf_boots";
+            case "Ice Skates" -> "ice_skates";
+            case "Snow Boots" -> "snow_boots";
+            case "Penguin Feet" -> "penguin_feet";
+            default -> "";
+        };
     }
 }

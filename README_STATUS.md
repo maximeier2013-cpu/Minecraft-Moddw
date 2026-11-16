@@ -1,16 +1,7 @@
-# Winter Magic 1.21.11 – weiterentwickeltes Quellprojekt
+# Winter Magic – Entwicklungsstand (Version 0.2.0)
 
-## Tatsächlich implementiert
-- Clientseitiger Fabric-Einstiegspunkt.
-- Erkennung der konfigurierten Amboss-Namen in der Haupt- oder Nebenhand.
-- Anzeige einer Aktionsleistenmeldung, wenn ein erkannter Name gehalten wird.
-- Übernommene 3D-Modell- und Texturdateien aus dem vorherigen Projekt (nicht validiert).
+**Implementiert:** 43 Amboss-Namen werden mit ihrem jeweiligen Vanilla-Grundgegenstand abgeglichen. Bei Übereinstimmung wird das clientseitige `minecraft:item_model`-Datenkomponentenfeld auf das vorhandene `wintermagic`-Item-Modell gesetzt. Dies betrifft Inventar, Hotbar und ausgerüstete Rüstung **als Inventargegenstand**. Nach Umbenennung zurück wird das Vanilla-Item-Modell wiederhergestellt.
 
-## Nicht implementiert
-- Automatischer Austausch der Item-Modelle durch Amboss-Namen.
-- Platzierte Dekorationen / persistente Positionen / Blockrenderer.
-- Sichtbare 3D-Rüstungsmodelle am Spieler.
-- Nordlichter / GUI.
+**Noch nicht implementiert:** 3D-Rüstungsmodelle *am Körper*; eigene Darstellung *platzierter* Blöcke; Synchronisation für andere Spieler; Nordlichter. Die vorhandenen 43 JSON-Modelle sind geometrische Prototypen. Auf fremden Servern können Änderungen an Item-Komponenten durch Serversynchronisation überschrieben werden. Diese Version wurde hier nicht gegen Minecraft zur Laufzeit getestet.
 
-## Build
-Es wurde KEIN erfolgreicher Build durchgeführt. Die Fabric-/Loom-Abhängigkeiten und Minecraft-1.21.11-APIs sind nicht geprüft. Das Projekt ist **keine fertige Mod**. Nach dem Gradle-Import muss möglicherweise die Java-API angepasst werden. Bitte nicht als funktionierende JAR verteilen.
+**Installation:** GitHub Actions `Build Winter Magic` starten, Artefakt `Winter-Magic-JAR` laden, die eigentliche Mod-JAR aus dem Artefakt in den Fabric-Mods-Ordner legen (nicht die `-sources.jar`). Fabric API ist erforderlich. Vorherige Version entfernen.
